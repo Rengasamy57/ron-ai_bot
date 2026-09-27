@@ -939,6 +939,7 @@ textarea, input {
   justify-content: center;
   flex-shrink: 0;
   opacity: 0.5;
+  cursor: pointer;
   transition: all var(--transition);
   box-shadow: 0 3px 10px rgba(0, 118, 254, 0.25);
 }
@@ -950,6 +951,14 @@ textarea, input {
 .btn-send.active:hover {
   transform: scale(1.06);
   box-shadow: 0 5px 16px rgba(0, 118, 254, 0.4);
+}
+
+.btn-send:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .composer-hint {

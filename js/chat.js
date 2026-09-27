@@ -817,14 +817,15 @@ function handleNewChat() {
  */
 async function handleSendMessage(overrideText = null) {
   if (isSending) return;
-  const content = (overrideText !== null ? overrideText : DOM.composer.value).trim();
+  const isOverride = typeof overrideText === 'string';
+  const content = (isOverride ? overrideText : (DOM.composer ? DOM.composer.value : '')).trim();
   if (!content) return;
 
   isSending = true;
   DOM.btnSend.disabled = true;
   DOM.composer.disabled = true;
 
-  if (overrideText === null) {
+  if (!isOverride) {
     DOM.composer.value = '';
     DOM.composer.style.height = 'auto';
     updateSendButton();
@@ -1083,7 +1084,10 @@ async function initChat() {
   }
 
   if (DOM.btnSend) {
-    DOM.btnSend.addEventListener('click', handleSendMessage);
+    DOM.btnSend.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleSendMessage();
+    });
   }
 
   // Suggestion Cards: populate composer, do not create conversation until send

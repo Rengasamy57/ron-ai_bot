@@ -235,15 +235,17 @@ function renderMessages(messages) {
 
   DOM.welcomeState.classList.add('hidden');
 
+  let lastUserPrompt = null;
   messages.forEach(msg => {
     if (msg.role === 'user') {
+      lastUserPrompt = msg.content;
       appendUserBubble(msg.content, msg.created_at);
     } else {
-      appendAssistantBubble(msg.content, msg.created_at);
+      appendAssistantBubble(msg.content, msg.created_at, lastUserPrompt);
     }
   });
 
-  scrollToBottom();
+  scrollToBottom(true, false);
 }
 
 function appendUserBubble(content, timestamp) {
@@ -276,7 +278,7 @@ function appendUserBubble(content, timestamp) {
   DOM.messagesList.appendChild(group);
 }
 
-function appendAssistantBubble(content, timestamp) {
+function appendAssistantBubble(content, timestamp, userPrompt = null) {
   const group = document.createElement('div');
   group.className = 'message-group assistant';
 
@@ -289,8 +291,20 @@ function appendAssistantBubble(content, timestamp) {
   inner.className = 'message-assistant-inner';
 
   const bubble = document.createElement('div');
-  bubble.className = 'message-bubble';
+  bubble.className = 'message-bubble assistant-markdown';
   bubble.innerHTML = formatAssistantText(content);
+
+  // Bind copy handlers to all code blocks inside this bubble
+  bubble.querySelectorAll('.btn-copy-code').forEach(copyBtn => {
+    copyBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const codeWrapper = copyBtn.closest('.code-block-wrapper');
+      const codeEl = codeWrapper ? codeWrapper.querySelector('code') : null;
+      if (codeEl) {
+        copyCodeToClipboard(copyBtn, codeEl.textContent);
+      }
+    });
+  });
 
   const time = document.createElement('div');
   time.className = 'message-time';
@@ -300,18 +314,40 @@ function appendAssistantBubble(content, timestamp) {
   const actions = document.createElement('div');
   actions.className = 'message-actions';
 
+  // 1. Copy Response Button
   const copyBtn = document.createElement('button');
-  copyBtn.className = 'btn-copy-msg';
+  copyBtn.className = 'btn-msg-action btn-copy-msg';
+  copyBtn.type = 'button';
+  copyBtn.title = 'Copy response';
+  copyBtn.setAttribute('aria-label', 'Copy response');
   copyBtn.innerHTML = `
     <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
     </svg>
-    <span>Copy</span>
+    <span class="action-label">Copy</span>
   `;
-  copyBtn.addEventListener('click', () => copyToClipboard(copyBtn, content));
+  copyBtn.addEventListener('click', () => copyResponseToClipboard(copyBtn, content));
+
+  // 2. Regenerate Response Button
+  const regenBtn = document.createElement('button');
+  regenBtn.className = 'btn-msg-action btn-regenerate-msg';
+  regenBtn.type = 'button';
+  regenBtn.title = 'Regenerate response';
+  regenBtn.setAttribute('aria-label', 'Regenerate response');
+  regenBtn.innerHTML = `
+    <svg class="regen-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="23 4 23 10 17 10"></polyline>
+      <polyline points="1 20 1 14 7 14"></polyline>
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+    </svg>
+    <span class="action-label">Regenerate</span>
+  `;
+  regenBtn.addEventListener('click', () => handleRegenerate(userPrompt));
 
   actions.appendChild(copyBtn);
+  actions.appendChild(regenBtn);
+
   inner.appendChild(bubble);
   inner.appendChild(time);
   inner.appendChild(actions);
@@ -322,66 +358,339 @@ function appendAssistantBubble(content, timestamp) {
   DOM.messagesList.appendChild(group);
 }
 
-function formatAssistantText(text) {
-  if (!text) return '';
-  const lines = text.split('\n');
-  let html = '';
-  let inList = false;
+/**
+ * Handle Regenerate Response:
+ * Re-submits the user prompt associated with this assistant response.
+ */
+function handleRegenerate(promptText) {
+  if (isSending) return;
 
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i].trim();
-    if (!line) {
-      if (inList) { html += '</ul>'; inList = false; }
-      html += '<br>';
-      continue;
-    }
-
-    const isBullet = line.startsWith('• ') || line.startsWith('- ') || line.startsWith('* ');
-    if (isBullet) {
-      if (!inList) { html += '<ul class="assistant-bullet-list">'; inList = true; }
-      const itemContent = formatInlineMarkup(line.substring(2).trim());
-      html += `<li>${itemContent}</li>`;
-    } else {
-      if (inList) { html += '</ul>'; inList = false; }
-      html += `<p class="assistant-paragraph">${formatInlineMarkup(line)}</p>`;
+  let textToSend = promptText;
+  if (!textToSend && DOM.messagesList) {
+    const userBubbles = DOM.messagesList.querySelectorAll('.message-group.user .message-bubble');
+    if (userBubbles.length > 0) {
+      textToSend = userBubbles[userBubbles.length - 1].textContent;
     }
   }
 
-  if (inList) html += '</ul>';
-  return html;
+  if (textToSend) {
+    handleSendMessage(textToSend);
+  }
 }
 
+/**
+ * Robust, XSS-safe Markdown parser for assistant responses.
+ * Supports:
+ * - Fenced code blocks with language header and copy button
+ * - Inline code with monospace highlight
+ * - Headings (#, ##, ###, ####)
+ * - Blockquotes (>)
+ * - Horizontal rules (---, ***, ___)
+ * - Unordered lists (-, *, •, +)
+ * - Ordered lists (1., 2., etc.)
+ * - Bold, italic, bold+italic, strikethrough
+ * - Markdown tables (| ... |)
+ * - Safe hyperlinks ([label](url))
+ * - Paragraphs & line breaks
+ */
+function formatAssistantText(text) {
+  if (!text) return '';
+
+  // 1. Normalize line breaks
+  let raw = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+  // 2. Extract fenced code blocks first so their contents aren't parsed as markdown
+  const codeBlocks = [];
+  raw = raw.replace(/(?:^|\n)```([a-zA-Z0-9_\-\+\.]*)\n?([\s\S]*?)(?:```|$)/g, (match, lang, code) => {
+    const cleanLang = (lang || 'code').trim().toLowerCase();
+    const cleanCode = code.replace(/\n$/, '');
+    const id = codeBlocks.length;
+    codeBlocks.push({
+      lang: cleanLang,
+      code: cleanCode
+    });
+    return `\n\n%%CODE_BLOCK_${id}%%\n\n`;
+  });
+
+  // 3. Process lines and block elements
+  const lines = raw.split('\n');
+  const blocks = [];
+  let currentList = null; // { type: 'ul' | 'ol', items: [] }
+  let currentTable = null; // { headers: [], rows: [] }
+  let currentBlockquote = [];
+  let currentParagraph = [];
+
+  function flushParagraph() {
+    if (currentParagraph.length > 0) {
+      const content = currentParagraph.map(l => formatInlineMarkup(l)).join('<br>');
+      blocks.push(`<p class="assistant-paragraph">${content}</p>`);
+      currentParagraph = [];
+    }
+  }
+
+  function flushList() {
+    if (currentList) {
+      if (currentList.type === 'ul') {
+        const itemsHtml = currentList.items.map(it => `<li>${formatInlineMarkup(it)}</li>`).join('');
+        blocks.push(`<ul class="assistant-bullet-list">${itemsHtml}</ul>`);
+      } else {
+        const itemsHtml = currentList.items.map(it => `<li>${formatInlineMarkup(it)}</li>`).join('');
+        blocks.push(`<ol class="assistant-numbered-list">${itemsHtml}</ol>`);
+      }
+      currentList = null;
+    }
+  }
+
+  function flushBlockquote() {
+    if (currentBlockquote.length > 0) {
+      const content = currentBlockquote.map(l => formatInlineMarkup(l)).join('<br>');
+      blocks.push(`<blockquote class="assistant-blockquote">${content}</blockquote>`);
+      currentBlockquote = [];
+    }
+  }
+
+  function flushTable() {
+    if (currentTable) {
+      const ths = currentTable.headers.map(h => `<th>${formatInlineMarkup(h)}</th>`).join('');
+      const rowsHtml = currentTable.rows.map(r => {
+        const tds = r.map(c => `<td>${formatInlineMarkup(c)}</td>`).join('');
+        return `<tr>${tds}</tr>`;
+      }).join('');
+      blocks.push(`
+        <div class="table-wrapper">
+          <table class="assistant-table">
+            <thead><tr>${ths}</tr></thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        </div>
+      `);
+      currentTable = null;
+    }
+  }
+
+  function flushAll() {
+    flushParagraph();
+    flushList();
+    flushBlockquote();
+    flushTable();
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Check code block placeholder
+    const codeMatch = trimmed.match(/^%%CODE_BLOCK_(\d+)%%$/);
+    if (codeMatch) {
+      flushAll();
+      const blockId = parseInt(codeMatch[1], 10);
+      const cb = codeBlocks[blockId];
+      if (cb) {
+        const escaped = escapeHtml(cb.code);
+        const langDisplay = cb.lang === 'code' ? 'Code' : cb.lang;
+        blocks.push(`
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <span class="code-lang-label">${escapeHtml(langDisplay)}</span>
+              <button class="btn-copy-code" type="button" aria-label="Copy code snippet">
+                <svg class="copy-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span class="copy-label">Copy code</span>
+              </button>
+            </div>
+            <pre class="code-block-pre"><code class="code-block-content language-${escapeHtml(cb.lang)}">${escaped}</code></pre>
+          </div>
+        `);
+      }
+      continue;
+    }
+
+    // Blank line
+    if (!trimmed) {
+      flushAll();
+      continue;
+    }
+
+    // Horizontal Rule: --- or *** or ___
+    if (/^(?:---+|\*\*\*+|___+)\s*$/.test(trimmed)) {
+      flushAll();
+      blocks.push('<hr class="assistant-hr" />');
+      continue;
+    }
+
+    // Headings: #, ##, ###, ####
+    const headingMatch = trimmed.match(/^(#{1,4})\s+(.+)$/);
+    if (headingMatch) {
+      flushAll();
+      const level = headingMatch[1].length;
+      const headingContent = formatInlineMarkup(headingMatch[2].trim());
+      blocks.push(`<h${level} class="assistant-h${level}">${headingContent}</h${level}>`);
+      continue;
+    }
+
+    // Blockquote: > text
+    const quoteMatch = line.match(/^>\s?(.*)$/);
+    if (quoteMatch) {
+      flushParagraph();
+      flushList();
+      flushTable();
+      currentBlockquote.push(quoteMatch[1]);
+      continue;
+    } else {
+      flushBlockquote();
+    }
+
+    // Table detection: line with | ... | and separator row |---|---|
+    if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.length > 2) {
+      const cells = trimmed.split('|').slice(1, -1).map(c => c.trim());
+      if (!currentTable && i + 1 < lines.length) {
+        const nextTrimmed = lines[i + 1].trim();
+        if (nextTrimmed.startsWith('|') && /^[\|\s\-:]+$/.test(nextTrimmed)) {
+          // Table header detected
+          flushParagraph();
+          flushList();
+          currentTable = { headers: cells, rows: [] };
+          i++; // Skip the separator row
+          continue;
+        }
+      } else if (currentTable) {
+        // Table body row
+        currentTable.rows.push(cells);
+        continue;
+      }
+    } else if (currentTable) {
+      flushTable();
+    }
+
+    // Unordered List item: -, *, •, +
+    const ulMatch = line.match(/^(\s*)(?:[\*\-\•]|\+)\s+(.+)$/);
+    if (ulMatch) {
+      flushParagraph();
+      flushBlockquote();
+      flushTable();
+      if (!currentList || currentList.type !== 'ul') {
+        flushList();
+        currentList = { type: 'ul', items: [] };
+      }
+      currentList.items.push(ulMatch[2]);
+      continue;
+    }
+
+    // Ordered List item: 1. Item
+    const olMatch = line.match(/^(\s*)\d+\.\s+(.+)$/);
+    if (olMatch) {
+      flushParagraph();
+      flushBlockquote();
+      flushTable();
+      if (!currentList || currentList.type !== 'ol') {
+        flushList();
+        currentList = { type: 'ol', items: [] };
+      }
+      currentList.items.push(olMatch[2]);
+      continue;
+    }
+
+    // Flush any pending list if current line is not a list item
+    if (currentList) {
+      flushList();
+    }
+
+    // Normal text line -> append to current paragraph
+    currentParagraph.push(trimmed);
+  }
+
+  flushAll();
+  return blocks.join('\n');
+}
+
+/**
+ * Format inline Markdown markup: bold, italic, inline code, links, strikethrough.
+ * Safely escapes HTML first to prevent XSS.
+ */
 function formatInlineMarkup(str) {
+  if (!str) return '';
+
+  // 1. Escape HTML for security
   let escaped = escapeHtml(str);
-  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  // 2. Inline code: `code`
+  escaped = escaped.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+
+  // 3. Bold + Italic: ***text*** or ___text___
+  escaped = escaped.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+  escaped = escaped.replace(/___([^_]+)___/g, '<strong><em>$1</em></strong>');
+
+  // 4. Bold: **text** or __text__
+  escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  escaped = escaped.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+
+  // 5. Italic: *text* or _text_
+  escaped = escaped.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  escaped = escaped.replace(/(?:^|\s)_([^_]+)_(?=\s|$)/g, ' <em>$1</em>');
+
+  // 6. Strikethrough: ~~text~~
+  escaped = escaped.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+
+  // 7. Safe hyperlinks: [text](http... or https...)
+  escaped = escaped.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\s\)"'<]+)\)/g,
+    '<a href="$2" class="assistant-link" target="_blank" rel="noopener noreferrer">$1</a>'
+  );
+
   return escaped;
 }
 
-function copyToClipboard(btn, text) {
-  navigator.clipboard.writeText(text).then(() => {
-    btn.classList.add('copied');
-    btn.querySelector('span').textContent = 'Copied!';
-    setTimeout(() => {
-      btn.classList.remove('copied');
-      btn.querySelector('span').textContent = 'Copy';
-    }, 1800);
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
+/**
+ * Copy helpers with animated visual feedback
+ */
+function copyCodeToClipboard(btn, text) {
+  copyTextWithFeedback(btn, text, 'Copy code', 'Copied!');
+}
 
+function copyResponseToClipboard(btn, text) {
+  copyTextWithFeedback(btn, text, 'Copy', 'Copied!');
+}
+
+function copyTextWithFeedback(btn, text, defaultLabel, copiedLabel) {
+  const labelEl = btn.querySelector('.copy-label, .action-label, span');
+  const markCopied = () => {
     btn.classList.add('copied');
-    btn.querySelector('span').textContent = 'Copied!';
+    if (labelEl) labelEl.textContent = copiedLabel;
     setTimeout(() => {
       btn.classList.remove('copied');
-      btn.querySelector('span').textContent = 'Copy';
-    }, 1800);
-  });
+      if (labelEl) labelEl.textContent = defaultLabel;
+    }, 2000);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(markCopied).catch(() => {
+      fallbackCopyText(text);
+      markCopied();
+    });
+  } else {
+    fallbackCopyText(text);
+    markCopied();
+  }
+}
+
+function fallbackCopyText(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  ta.style.top = '-9999px';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+  } catch (err) {
+    console.warn('Fallback copy error:', err);
+  }
+  document.body.removeChild(ta);
 }
 
 /**
@@ -507,7 +816,7 @@ async function handleSendMessage(overrideText = null) {
 
   if (overrideText === null) {
     DOM.composer.value = '';
-    autoResizeTextarea(DOM.composer);
+    DOM.composer.style.height = 'auto';
     updateSendButton();
   }
 
@@ -516,11 +825,11 @@ async function handleSendMessage(overrideText = null) {
 
   // 2. Display the user message bubble immediately
   appendUserBubble(content, new Date().toISOString());
-  scrollToBottom();
+  scrollToBottom(true, false);
 
   // 3. Show loading/thinking state
   showThinkingIndicator();
-  scrollToBottom();
+  scrollToBottom(true, true);
 
   try {
     // 4. Ensure conversation exists if needed
@@ -535,7 +844,7 @@ async function handleSendMessage(overrideText = null) {
           "Unable to create conversation. Please try again.",
           () => handleSendMessage(content)
         );
-        scrollToBottom();
+        scrollToBottom(true, true);
         return;
       }
       const newConv = await resConv.json();
@@ -564,14 +873,15 @@ async function handleSendMessage(overrideText = null) {
         } catch (_) {}
       }
       appendErrorMessage(errMsg, () => handleSendMessage(content));
-      scrollToBottom();
+      scrollToBottom(true, true);
       return;
     }
 
     const data = await res.json();
     if (data.assistant_message && data.assistant_message.content) {
-      appendAssistantBubble(data.assistant_message.content, data.assistant_message.created_at);
-      scrollToBottom();
+      // Pass the user content so Regenerate knows which prompt was answered
+      appendAssistantBubble(data.assistant_message.content, data.assistant_message.created_at, content);
+      scrollToBottom(false, true);
     }
 
     // 6. Refresh conversation list so updated title / order appears
@@ -587,7 +897,7 @@ async function handleSendMessage(overrideText = null) {
       "Network error connecting to Ron. Please check your connection and try again.",
       () => handleSendMessage(content)
     );
-    scrollToBottom();
+    scrollToBottom(true, true);
   } finally {
     isSending = false;
     DOM.composer.disabled = false;
@@ -613,6 +923,7 @@ async function deleteConversation(convId) {
  * UI & Event Helpers
  */
 function autoResizeTextarea(ta) {
+  if (!ta) return;
   ta.style.height = 'auto';
   ta.style.height = Math.min(ta.scrollHeight, 140) + 'px';
 }
@@ -622,9 +933,32 @@ function updateSendButton() {
   DOM.btnSend.classList.toggle('active', hasText);
 }
 
-function scrollToBottom() {
+/**
+ * Smart Auto-Scroll Behavior:
+ * - When force = true (e.g. user sent message), unconditionally scroll to bottom.
+ * - Otherwise only scroll if the user is already near the bottom (within threshold),
+ *   avoiding interrupting the user if they scrolled up to read earlier responses.
+ */
+function isScrolledNearBottom() {
+  if (!DOM.messagesArea) return true;
+  const threshold = 140;
+  const distance = DOM.messagesArea.scrollHeight - DOM.messagesArea.scrollTop - DOM.messagesArea.clientHeight;
+  return distance <= threshold;
+}
+
+function scrollToBottom(force = false, smooth = false) {
+  if (!DOM.messagesArea) return;
+  if (!force && !isScrolledNearBottom()) {
+    return;
+  }
   requestAnimationFrame(() => {
-    if (DOM.messagesArea) {
+    if (!DOM.messagesArea) return;
+    if (smooth) {
+      DOM.messagesArea.scrollTo({
+        top: DOM.messagesArea.scrollHeight,
+        behavior: 'smooth'
+      });
+    } else {
       DOM.messagesArea.scrollTop = DOM.messagesArea.scrollHeight;
     }
   });
@@ -689,6 +1023,14 @@ async function initChat() {
   if (DOM.btnNewChat) DOM.btnNewChat.addEventListener('click', handleNewChat);
   if (DOM.btnLogout) DOM.btnLogout.addEventListener('click', logout);
 
+  // Apply saved theme on startup
+  const savedTheme = localStorage.getItem('ron-theme') || 'light';
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+  } else {
+    document.body.classList.remove('dark-theme');
+  }
+
   // Theme Toggle
   const themeToggle = document.getElementById('themeToggleChat');
   if (themeToggle) {
@@ -699,7 +1041,7 @@ async function initChat() {
     });
   }
 
-  // Composer events
+  // Composer events: Enter to Send, Shift+Enter for New Line
   if (DOM.composer) {
     DOM.composer.addEventListener('input', () => {
       autoResizeTextarea(DOM.composer);
@@ -707,9 +1049,19 @@ async function initChat() {
     });
 
     DOM.composer.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      if (e.key === 'Enter') {
+        if (e.isComposing) return;
+        if (e.shiftKey) {
+          // Shift + Enter: Allow natural newline insertion, then adjust height
+          requestAnimationFrame(() => autoResizeTextarea(DOM.composer));
+          return;
+        }
+        // Enter without Shift: Send message
         e.preventDefault();
-        handleSendMessage();
+        const text = DOM.composer.value.trim();
+        if (text && !isSending) {
+          handleSendMessage();
+        }
       }
     });
   }

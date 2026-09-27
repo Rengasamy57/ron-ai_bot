@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ron AI — Chat</title>
+  <meta name="description" content="Ron AI — Your premium personal AI assistant" />
+
+  <!-- Fonts: Plus Jakarta Sans for cohesive typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../css/chat.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="../assets/images/ron-logo.png" type="image/png" />
+</head>
+<body>
+
+<!-- Authentication Utility -->
+<script src="../js/auth.js"></script>
+
+<!-- Chat Shell Container -->
+<div class="chat-shell">
+
+  <!-- ======================================================
+       SIDEBAR (Approx 270px width, matching reference)
+       ====================================================== -->
+  <aside class="chat-sidebar" id="chatSidebar" role="navigation" aria-label="Chat navigation">
+
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <a href="../index.html" class="sidebar-brand-link" aria-label="Ron AI Home">
+        <div class="brand-avatar-box">
+          <img
+            src="../assets/images/ron-logo.png"
+            alt="Ron mascot"
+            class="sidebar-brand-logo"
+          />
+        </div>
+        <span class="sidebar-brand-name">Ron</span>
+      </a>
+    </div>
+
+    <!-- New Chat Button -->
+    <div class="sidebar-action-wrap">
+      <button class="btn-new-chat" id="btnNewChat" aria-label="Start a new chat">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>New Chat</span>
+      </button>
+    </div>
+
+    <!-- Chats Section Header -->
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Chats</div>
+    </div>
+
+    <!-- Real User Chat List Container -->
+    <div class="sidebar-chats-container">
+      <ul class="sidebar-chats" id="chatList" role="list">
+        <!-- Dynamically rendered per authenticated user -->
+      </ul>
+
+      <!-- Empty State: Shown only when user has zero conversations -->
+      <div class="sidebar-empty-state hidden" id="sidebarEmptyState">
+        <div class="empty-icon-bubble" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <p class="empty-title">No chats yet</p>
+        <p class="empty-desc">Start a new conversation with Ron.</p>
+      </div>
+    </div>
+
+    <!-- User Profile & Logout Area (Bottom) -->
+    <div class="sidebar-user">
+      <div class="sidebar-user-profile" id="userProfileCard">
+        <div class="sidebar-user-avatar" id="sidebarUserAvatar" aria-hidden="true">U</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebarUserName">Loading...</div>
+          <div class="sidebar-user-email" id="sidebarUserEmail">...</div>
+        </div>
+      </div>
+
+      <button class="btn-logout" id="btnLogout" aria-label="Sign out from Ron AI">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        <span>Sign out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile Drawer Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay" role="presentation" aria-hidden="true"></div>
+
+  <!-- ======================================================
+       MAIN CHAT AREA
+       ====================================================== -->
+  <main class="chat-main" role="main">
+
+    <!-- Top Chat Header (Matching Reference with Theme Icon + User Chip) -->
+    <header class="chat-header" role="banner">
+      <div class="header-left">
+        <!-- Mobile hamburger -->
+        <button class="btn-hamburger" id="btnHamburger" aria-label="Toggle navigation menu" aria-controls="chatSidebar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- Brand / Online Status -->
+        <div class="header-title">
+          <img
+            src="../assets/images/ron-logo.png"
+            alt="Ron AI"
+            class="header-logo"
+          />
+          <div class="header-brand-info">
+            <div class="header-brand">Ron AI</div>
+            <div class="header-status">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span>Online</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Theme Toggle + User Avatar Chip -->
+      <div class="header-right">
+        <!-- Theme toggle icon matching reference -->
+        <button class="header-theme-btn" id="themeToggleChat" aria-label="Toggle theme" title="Toggle theme">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+          </svg>
+        </button>
+
+        <div class="header-user-chip" role="status" aria-live="polite">
+          <div class="header-user-avatar" id="headerUserAvatar" aria-hidden="true">U</div>
+          <span class="header-user-name" id="headerUserName">User</span>
+          <svg class="header-user-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- Messages / Welcome Area -->
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Conversation messages">
+
+      <!-- ====================================================
+           EMPTY / WELCOME STATE (Exact match to Reference)
+           ==================================================== -->
+      <div class="chat-welcome" id="welcomeState">
+        <div class="welcome-mascot-wrap">
+          <div class="chat-sparkle chat-sparkle-1" aria-hidden="true">✦</div>
+          <div class="chat-sparkle chat-sparkle-2" aria-hidden="true">✦</div>
+          <div class="chat-sparkle chat-sparkle-3" aria-hidden="true">✦</div>
+          <img
+            src="../assets/images/ron-mascot.png"
+            alt="Ron mascot"
+            class="welcome-mascot"
+            id="welcomeMascot"
+          />
+        </div>
+
+        <h1 class="welcome-greeting">
+          Hello, <span id="greetingName">there!</span>
+          <span class="wave" aria-hidden="true">👋</span>
+        </h1>
+
+        <p class="welcome-sub">
+          Ask anything, learn faster, write better, and turn your ideas into reality.
+        </p>
+
+        <!-- 4 Suggestion Cards -->
+        <div class="welcome-suggestions" role="list">
+          <button
+            class="suggestion-card"
+            data-prompt="Explain a concept to me in simple terms."
+            role="listitem"
+            aria-label="Suggestion: Explain a concept"
+          >
+            <div class="suggestion-icon" aria-hidden="true">💡</div>
+            <span class="suggestion-text">Explain a concept</span>
+          </button>
+
+          <button
+            class="suggestion-card"
+            data-prompt="Help me write or debug some code."
+            role="listitem"
+            aria-label="Suggestion: Help me code"
+          >
+            <div class="suggestion-icon" aria-hidden="true">⌨️</div>
+            <span class="suggestion-text">Help me code</span>
+          </button>
+
+          <button
+            class="suggestion-card"
+            data-prompt="Analyze this topic and give me a detailed breakdown."
+            role="listitem"
+            aria-label="Suggestion: Analyze something"
+          >
+            <div class="suggestion-icon" aria-hidden="true">🔍</div>
+            <span class="suggestion-text">Analyze something</span>
+          </button>
+
+          <button
+            class="suggestion-card"
+            data-prompt="Help me study and prepare for my exam."
+            role="listitem"
+            aria-label="Suggestion: Help me study"
+          >
+            <div class="suggestion-icon" aria-hidden="true">📚</div>
+            <span class="suggestion-text">Help me study</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages container dynamically injected here -->
+      <div class="messages-list" id="messagesList"></div>
+    </div>
+
+    <!-- Fixed Bottom Message Composer -->
+    <div class="chat-composer-wrap">
+      <div class="chat-composer" role="form" aria-label="Message composer">
+        <!-- Visual Attachment Icon (Visual-only for now) -->
+        <button class="composer-attach" aria-label="Attachment (coming in future update)" disabled title="File attachment coming in future update">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+          </svg>
+        </button>
+
+        <textarea
+          class="composer-textarea"
+          id="composerTextarea"
+          placeholder="Ask Ron anything..."
+          rows="1"
+          maxlength="4000"
+          aria-label="Type your message to Ron"
+        ></textarea>
+
+        <button class="btn-send" id="btnSend" aria-label="Send message">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+
+      <p class="composer-hint">
+        Press <kbd>Enter</kbd> to send &nbsp;·&nbsp; <kbd>Shift + Enter</kbd> for a new line
+      </p>
+    </div>
+
+  </main>
+</div>
+
+<!-- Chat JS logic -->
+<script src="../js/chat.js"></script>
+
+</body>
+</html>

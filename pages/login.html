@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — Ron AI</title>
+    <meta name="description" content="Sign in to your Ron AI account and continue your conversation with your personal AI companion.">
+    <link rel="icon" type="image/png" href="../assets/images/ron-logo.png">
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body class="light-theme auth-page">
+    <!-- Atmospheric Cloud Background -->
+    <div class="bg-atmosphere" aria-hidden="true">
+        <div class="sky-base-gradient"></div>
+        <div class="cloud-layer cloud-crest-top"></div>
+        <div class="cloud-layer cloud-puff-left"></div>
+        <div class="cloud-layer cloud-puff-right"></div>
+        <div class="cloud-layer cloud-hero-bank"></div>
+        <div class="glow-orb hero-mascot-glow"></div>
+        <div class="glow-orb top-nav-glow"></div>
+    </div>
+
+    <div class="page-wrapper auth-page-wrapper">
+        <!-- Header / Navbar matching reference -->
+                <!-- Clean Auth Header (No overlap, focused authentication experience) -->
+        <header class="navbar auth-navbar">
+            <div class="nav-container auth-nav-container">
+                <a href="../index.html" class="brand" aria-label="Ron AI Home">
+                    <div class="brand-avatar">
+                        <img src="../assets/images/ron-logo.png" alt="Ron mascot" width="38" height="38">
+                    </div>
+                    <span class="brand-text">Ron AI</span>
+                </a>
+
+                <div class="auth-nav-actions">
+                    <a href="../index.html" class="auth-back-link" aria-label="Back to Home">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        <span>Back to Home</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Auth Layout Grid (Left Hero Showcase + Right White Glass Login Card) -->
+        <main class="auth-main-container">
+            <div class="auth-layout-grid">
+                <!-- Left: Hero Mascot & Floating Chips (Matching Reference) -->
+                <div class="auth-left-showcase animate-fade-in">
+                    <!-- Badge -->
+                    <div class="hero-badge">
+                        <span class="badge-sparkle">✦</span>
+                        <span class="badge-text">Your Personal AI Assistant</span>
+                    </div>
+
+                    <!-- Heading -->
+                    <h1 class="auth-hero-title">
+                        <span class="title-line title-dark">Welcome Back</span>
+                        <span class="title-line title-gradient">to Ron</span>
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <p class="auth-hero-desc">
+                        Sign in to continue your AI journey and turn your ideas into reality.
+                    </p>
+
+                    <!-- Mascot Stage with Floating Chips & Plane -->
+                    <div class="auth-mascot-stage">
+                        <!-- Origami Paper Plane -->
+                        <div class="deco-paper-plane" aria-hidden="true">
+                            <svg class="plane-trail" viewBox="0 0 120 60" fill="none">
+                                <path d="M10 50 C 45 50, 75 35, 110 15" stroke="#93c5fd" stroke-width="1.8" stroke-dasharray="3 4"/>
+                            </svg>
+                            <svg class="plane-svg" viewBox="0 0 48 48" width="40" height="40" fill="none">
+                                <path d="M42 6L6 22L20 28L26 42L42 6Z" fill="url(#planeGradLogin)"/>
+                                <path d="M20 28L42 6L26 42L20 28Z" fill="#60a5fa" opacity="0.6"/>
+                                <path d="M20 28L28 20L42 6" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+                                <defs>
+                                    <linearGradient id="planeGradLogin" x1="6" y1="6" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#93c5fd"/>
+                                        <stop offset="1" stop-color="#2563eb"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+
+                        <!-- Sparkles -->
+                        <div class="deco-sparkle sparkle-1" aria-hidden="true">✦</div>
+                        <div class="deco-sparkle sparkle-2" aria-hidden="true">✦</div>
+                        <div class="deco-sparkle sparkle-3" aria-hidden="true">✦</div>
+
+                        <!-- Joy dashes above Ron -->
+                        <div class="joy-radiate" aria-hidden="true">
+                            <span class="joy-bar bar-left"></span>
+                            <span class="joy-bar bar-center"></span>
+                            <span class="joy-bar bar-right"></span>
+                        </div>
+
+                        <!-- Floating Chip 1: Ask anything -->
+                        <div class="floating-chip chip-ask">
+                            <div class="chip-icon-box chip-icon-blue">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0076fe" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="14" rx="3" ry="3"></rect>
+                                    <circle cx="8.5" cy="11" r="1.5" fill="#0076fe"></circle>
+                                    <circle cx="15.5" cy="11" r="1.5" fill="#0076fe"></circle>
+                                    <line x1="12" y1="1" x2="12" y2="4"></line>
+                                </svg>
+                            </div>
+                            <div class="chip-label">
+                                <span class="chip-title">Ask</span>
+                                <span class="chip-sub">anything</span>
+                            </div>
+                        </div>
+
+                        <!-- Floating Chip 2: Write & create -->
+                        <div class="floating-chip chip-write">
+                            <div class="chip-icon-box chip-icon-purple">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <line x1="10" y1="9" x2="8" y2="9"></line>
+                                </svg>
+                            </div>
+                            <div class="chip-label">
+                                <span class="chip-title">Write &</span>
+                                <span class="chip-sub">create</span>
+                            </div>
+                        </div>
+
+                        <!-- Floating Chip 3: Analyze data -->
+                        <div class="floating-chip chip-analyze">
+                            <div class="chip-icon-box chip-icon-violet">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8b5cf6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="12" width="4" height="8" rx="1"></rect>
+                                    <rect x="10" y="8" width="4" height="12" rx="1"></rect>
+                                    <rect x="17" y="4" width="4" height="16" rx="1"></rect>
+                                </svg>
+                            </div>
+                            <div class="chip-label">
+                                <span class="chip-title">Analyze</span>
+                                <span class="chip-sub">data</span>
+                            </div>
+                        </div>
+
+                        <!-- Floating Chip 4: Solve problems -->
+                        <div class="floating-chip chip-solve">
+                            <div class="chip-icon-box chip-icon-amber">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 18h6"></path>
+                                    <path d="M10 22h4"></path>
+                                    <path d="M12 2a7 7 0 0 0-7 7c0 2.6 1.4 4.8 3.5 6h7c2.1-1.2 3.5-3.4 3.5-6a7 7 0 0 0-7-7z"></path>
+                                </svg>
+                            </div>
+                            <div class="chip-label">
+                                <span class="chip-title">Solve</span>
+                                <span class="chip-sub">problems</span>
+                            </div>
+                        </div>
+
+                        <!-- Mascot Image -->
+                        <div class="auth-mascot-wrapper">
+                            <img src="../assets/images/ron-mascot.png" alt="Ron Mascot" class="auth-mascot-img" width="380" height="380">
+                        </div>
+
+                        <!-- Cloud Puffs -->
+                        <div class="auth-cloud-cushion" aria-hidden="true"></div>
+                    </div>
+                </div>
+
+                <!-- Right: Login Form Card (Exact match to Reference) -->
+                <div class="auth-card-col animate-fade-in delay-1">
+                    <div class="auth-card">
+                        <!-- Top Avatar Icon -->
+                        <div class="card-avatar-wrapper">
+                            <div class="card-avatar">
+                                <img src="../assets/images/ron-logo.png" alt="Ron mascot" width="56" height="56">
+                            </div>
+                        </div>
+
+                        <!-- Card Heading -->
+                        <div class="auth-card-header text-center">
+                            <h2 class="auth-title">Welcome back 👋</h2>
+                            <p class="auth-subtitle">Sign in to your Ron account</p>
+                        </div>
+
+                        <!-- Alert Box for Error / Success -->
+                        <div class="form-alert hidden" id="loginAlert" role="alert" aria-live="polite">
+                            <span class="alert-icon" id="loginAlertIcon"></span>
+                            <span class="alert-text" id="loginAlertText"></span>
+                        </div>
+
+                        <!-- Login Form -->
+                        <form class="auth-form" id="loginForm" novalidate>
+                            <!-- Email Field -->
+                            <div class="form-group" id="group-loginEmail">
+                                <div class="input-wrapper">
+                                    <span class="input-icon" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                                        </svg>
+                                    </span>
+                                    <input 
+                                        type="email" 
+                                        id="loginEmail" 
+                                        name="email" 
+                                        class="form-input" 
+                                        placeholder="Email address" 
+                                        autocomplete="email"
+                                        required
+                                    >
+                                </div>
+                                <div class="inline-error" id="error-loginEmail" aria-live="polite"></div>
+                            </div>
+
+                            <!-- Password Field -->
+                            <div class="form-group" id="group-loginPassword">
+                                <div class="input-wrapper">
+                                    <span class="input-icon" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                        </svg>
+                                    </span>
+                                    <input 
+                                        type="password" 
+                                        id="loginPassword" 
+                                        name="password" 
+                                        class="form-input" 
+                                        placeholder="Password" 
+                                        autocomplete="current-password"
+                                        required
+                                    >
+                                    <button type="button" class="btn-toggle-pwd" data-target="loginPassword" aria-label="Toggle password visibility">
+                                        <svg class="eye-open" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        <svg class="eye-closed hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="m15 18-.722-3.25"></path>
+                                            <path d="M2 8a10.645 10.645 0 0 0 20 0"></path>
+                                            <path d="m20 15-1.726-2.05"></path>
+                                            <path d="m4 15 1.726-2.05"></path>
+                                            <path d="m9 18 .722-3.25"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="inline-error" id="error-loginPassword" aria-live="polite"></div>
+                            </div>
+
+                            <!-- Row: Remember Me & Forgot Password -->
+                            <div class="form-row-auth">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="rememberMe" name="remember" checked>
+                                    <span class="custom-checkbox" aria-hidden="true">
+                                        <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
+                                            <path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </span>
+                                    <span class="checkbox-label">Remember me</span>
+                                </label>
+
+                                
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary btn-auth-submit" id="loginSubmitBtn">
+                                <span class="btn-text">Sign In</span>
+                                <span class="btn-arrow" aria-hidden="true">&rarr;</span>
+                                <span class="spinner hidden" id="loginSpinner" aria-hidden="true"></span>
+                            </button>
+                        </form>
+
+                        <!-- Card Footer -->
+                        <div class="auth-card-footer">
+                            <p class="footer-text">
+                                Don't have an account? 
+                                <a href="signup.html" class="auth-link-bold">Sign up</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/main.js"></script>
+    <script src="../js/auth.js"></script>
+</body>
+</html>

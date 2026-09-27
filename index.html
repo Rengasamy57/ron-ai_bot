@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ron — Your AI Companion</title>
+    <meta name="description" content="Ask anything, learn faster, write better, solve problems, and turn your ideas into reality — all in one place with Ron.">
+    <link rel="icon" type="image/png" href="assets/images/ron-logo.png">
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="light-theme">
+    <!-- Atmospheric Cloud & Sky Background -->
+    <div class="bg-atmosphere" aria-hidden="true">
+        <div class="sky-base-gradient"></div>
+        <div class="cloud-layer cloud-crest-top"></div>
+        <div class="cloud-layer cloud-puff-left"></div>
+        <div class="cloud-layer cloud-puff-right"></div>
+        <div class="cloud-layer cloud-hero-bank"></div>
+        <div class="glow-orb hero-mascot-glow"></div>
+        <div class="glow-orb top-nav-glow"></div>
+    </div>
+
+    <div class="page-wrapper">
+        <!-- Header / Navbar -->
+        <header class="navbar" id="navbar">
+            <div class="nav-container">
+                <!-- Brand Logo & Name -->
+                <a href="#" class="brand" aria-label="Ron AI Home" style="margin-right: 32px;">
+                    <div class="brand-avatar">
+                        <img src="assets/images/ron-logo.png" alt="Ron mascot avatar" width="40" height="40">
+                    </div>
+                    <span class="brand-text">Ron</span>
+                </a>
+
+                <!-- Navigation Menu -->
+                <nav class="nav-menu" id="navMenu" aria-label="Main Navigation">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active">
+                                Home
+                                <span class="active-indicator"></span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#features" class="nav-link">Features</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#pricing" class="nav-link">Pricing</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#faq" class="nav-link">FAQ</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Navbar Right Actions -->
+                <div class="nav-actions">
+                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+                        <svg class="sun-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <path d="M12 2v2"></path>
+                            <path d="M12 20v2"></path>
+                            <path d="m4.93 4.93 1.41 1.41"></path>
+                            <path d="m17.66 17.66 1.41 1.41"></path>
+                            <path d="M2 12h2"></path>
+                            <path d="M20 12h2"></path>
+                            <path d="m6.34 17.66-1.41 1.41"></path>
+                            <path d="m19.07 4.93-1.41 1.41"></path>
+                        </svg>
+                        <svg class="moon-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                        </svg>
+                    </button>
+
+                    <a href="pages/signup.html" class="btn btn-primary nav-cta">
+                        <span>Get Started</span>
+                        <span class="btn-arrow" aria-hidden="true">&rarr;</span>
+                    </a>
+
+                    <!-- Mobile Hamburger Button -->
+                    <button class="mobile-toggle-btn" id="mobileToggle" aria-label="Open navigation menu" aria-expanded="false">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero-section" id="home">
+                <div class="hero-container">
+                    <!-- Left: Hero Text Column -->
+                    <div class="hero-text-col">
+                        <!-- Small Badge -->
+                        <div class="hero-badge animate-fade-in">
+                            <span class="badge-sparkle">✦</span>
+                            <span class="badge-text">Your Personal AI Assistant</span>
+                        </div>
+
+                        <!-- Main Heading -->
+                        <h1 class="hero-title animate-fade-in delay-1">
+                            <span class="title-line title-dark">Your Ideas.</span>
+                            <span class="title-line title-gradient">Your AI Companion.</span>
+                        </h1>
+
+                        <!-- Supporting Description -->
+                        <p class="hero-description animate-fade-in delay-2">
+                            Ask anything, learn faster, write better, solve problems, and turn your ideas into reality — all in one place.
+                        </p>
+
+                        <!-- Primary CTA Button -->
+                        <div class="hero-cta-wrapper animate-fade-in delay-3">
+                            <a href="pages/signup.html" class="btn btn-primary btn-hero">
+                                <span>Get Started</span>
+                                <span class="btn-arrow" aria-hidden="true">&rarr;</span>
+                            </a>
+                        </div>
+
+                        <!-- Value Props / Feature Checks -->
+                        <div class="hero-trust-list animate-fade-in delay-4">
+                            <div class="trust-item">
+                                <span class="check-badge">
+                                    <svg viewBox="0 0 18 18" width="16" height="16" fill="none">
+                                        <circle cx="9" cy="9" r="9" fill="#0076fe"/>
+                                        <path d="M5.2 9.2L7.6 11.6L12.8 6.4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                                <span class="trust-text">Free to use</span>
+                            </div>
+
+                            <div class="trust-item">
+                                <span class="check-badge">
+                                    <svg viewBox="0 0 18 18" width="16" height="16" fill="none">
+                                        <circle cx="9" cy="9" r="9" fill="#0076fe"/>
+                                        <path d="M5.2 9.2L7.6 11.6L12.8 6.4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                                <span class="trust-text">No credit card required</span>
+                            </div>
+
+                            <div class="trust-item">
+                                <span class="check-badge">
+                                    <svg viewBox="0 0 18 18" width="16" height="16" fill="none">
+                                        <circle cx="9" cy="9" r="9" fill="#0076fe"/>
+                                        <path d="M5.2 9.2L7.6 11.6L12.8 6.4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </span>
+                                <span class="trust-text">Powered by AI</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Hero Mascot & Floating Cards Visual -->
+                    <div class="hero-visual-col animate-fade-in delay-2">
+                        <div class="mascot-stage">
+                            <!-- Paper Plane in top right -->
+                            <div class="deco-paper-plane" aria-hidden="true">
+                                <svg class="plane-trail" viewBox="0 0 140 70" fill="none">
+                                    <path d="M10 60 C 50 60, 85 40, 125 15" stroke="#93c5fd" stroke-width="2" stroke-dasharray="4 5"/>
+                                </svg>
+                                <svg class="plane-svg" viewBox="0 0 48 48" width="46" height="46" fill="none">
+                                    <path d="M44 4L4 22L19 29L26 44L44 4Z" fill="url(#planeGradient)"/>
+                                    <path d="M19 29L44 4L26 44L19 29Z" fill="#60a5fa" opacity="0.6"/>
+                                    <path d="M19 29L28 20L44 4" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round"/>
+                                    <defs>
+                                        <linearGradient id="planeGradient" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#93c5fd"/>
+                                            <stop offset="1" stop-color="#2563eb"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+
+                            <!-- Floating Sparkles -->
+                            <div class="deco-sparkle sparkle-1" aria-hidden="true">✦</div>
+                            <div class="deco-sparkle sparkle-2" aria-hidden="true">✦</div>
+                            <div class="deco-sparkle sparkle-3" aria-hidden="true">✦</div>
+
+                            <!-- Joy radiation dashes centered above Ron's Beanie -->
+                            <div class="joy-radiate" aria-hidden="true">
+                                <span class="joy-bar bar-left"></span>
+                                <span class="joy-bar bar-center"></span>
+                                <span class="joy-bar bar-right"></span>
+                            </div>
+
+                            <!-- Floating Card 1: Ask anything -->
+                            <div class="floating-chip chip-ask" id="chipAsk">
+                                <div class="chip-icon-box chip-icon-blue">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0076fe" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="14" rx="3" ry="3"></rect>
+                                        <circle cx="8.5" cy="11" r="1.5" fill="#0076fe"></circle>
+                                        <circle cx="15.5" cy="11" r="1.5" fill="#0076fe"></circle>
+                                        <line x1="12" y1="1" x2="12" y2="4"></line>
+                                    </svg>
+                                </div>
+                                <div class="chip-label">
+                                    <span class="chip-title">Ask</span>
+                                    <span class="chip-sub">anything</span>
+                                </div>
+                            </div>
+
+                            <!-- Floating Card 2: Write & create -->
+                            <div class="floating-chip chip-write" id="chipWrite">
+                                <div class="chip-icon-box chip-icon-purple">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#6366f1" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <line x1="10" y1="9" x2="8" y2="9"></line>
+                                    </svg>
+                                </div>
+                                <div class="chip-label">
+                                    <span class="chip-title">Write &</span>
+                                    <span class="chip-sub">create</span>
+                                </div>
+                            </div>
+
+                            <!-- Floating Card 3: Analyze data -->
+                            <div class="floating-chip chip-analyze" id="chipAnalyze">
+                                <div class="chip-icon-box chip-icon-violet">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#8b5cf6" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="12" width="4" height="8" rx="1"></rect>
+                                        <rect x="10" y="8" width="4" height="12" rx="1"></rect>
+                                        <rect x="17" y="4" width="4" height="16" rx="1"></rect>
+                                    </svg>
+                                </div>
+                                <div class="chip-label">
+                                    <span class="chip-title">Analyze</span>
+                                    <span class="chip-sub">data</span>
+                                </div>
+                            </div>
+
+                            <!-- Floating Card 4: Solve problems -->
+                            <div class="floating-chip chip-solve" id="chipSolve">
+                                <div class="chip-icon-box chip-icon-amber">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#f59e0b" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 18h6"></path>
+                                        <path d="M10 22h4"></path>
+                                        <path d="M12 2a7 7 0 0 0-7 7c0 2.6 1.4 4.8 3.5 6h7c2.1-1.2 3.5-3.4 3.5-6a7 7 0 0 0-7-7z"></path>
+                                    </svg>
+                                </div>
+                                <div class="chip-label">
+                                    <span class="chip-title">Solve</span>
+                                    <span class="chip-sub">problems</span>
+                                </div>
+                            </div>
+
+                            <!-- Large Prominent Mascot Character -->
+                            <div class="mascot-wrapper">
+                                <img src="assets/images/ron-mascot.png" alt="Ron AI Mascot typing on a laptop on clouds" class="mascot-image" width="560" height="560">
+                            </div>
+
+                            <!-- Organic Cloud Landscape Layers -->
+                            <div class="mascot-cloud-underlay" aria-hidden="true">
+                                <div class="cloud-mound mound-1"></div>
+                                <div class="cloud-mound mound-2"></div>
+                                <div class="cloud-mound mound-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lower Feature Cards Section -->
+            <section class="features-section" id="features">
+                <div class="features-container">
+                    <div class="features-grid">
+                        <!-- Card 1: Instant Answers -->
+                        <article class="feature-card">
+                            <div class="feature-icon-wrapper bg-icon-blue">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#0076fe" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="14" rx="3" ry="3"></rect>
+                                    <circle cx="8.5" cy="11" r="1.5" fill="#0076fe"></circle>
+                                    <circle cx="15.5" cy="11" r="1.5" fill="#0076fe"></circle>
+                                    <line x1="12" y1="1" x2="12" y2="4"></line>
+                                </svg>
+                            </div>
+                            <h2 class="feature-card-title">Instant Answers</h2>
+                            <p class="feature-card-desc">Get clear and reliable responses in seconds.</p>
+                        </article>
+
+                        <!-- Card 2: Better Writing -->
+                        <article class="feature-card">
+                            <div class="feature-icon-wrapper bg-icon-purple">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#7c3aed" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <line x1="10" y1="9" x2="8" y2="9"></line>
+                                </svg>
+                            </div>
+                            <h2 class="feature-card-title">Better Writing</h2>
+                            <p class="feature-card-desc">Create essays, content, and summaries easily.</p>
+                        </article>
+
+                        <!-- Card 3: Deep Analysis -->
+                        <article class="feature-card">
+                            <div class="feature-icon-wrapper bg-icon-green">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#059669" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="12" width="4" height="8" rx="1"></rect>
+                                    <rect x="10" y="8" width="4" height="12" rx="1"></rect>
+                                    <rect x="17" y="4" width="4" height="16" rx="1"></rect>
+                                </svg>
+                            </div>
+                            <h2 class="feature-card-title">Deep Analysis</h2>
+                            <p class="feature-card-desc">Understand complex topics with simple insights.</p>
+                        </article>
+
+                        <!-- Card 4: Explore Ideas -->
+                        <article class="feature-card">
+                            <div class="feature-icon-wrapper bg-icon-amber">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 18h6"></path>
+                                    <path d="M10 22h4"></path>
+                                    <path d="M12 2a7 7 0 0 0-7 7c0 2.6 1.4 4.8 3.5 6h7c2.1-1.2 3.5-3.4 3.5-6a7 7 0 0 0-7-7z"></path>
+                                </svg>
+                            </div>
+                            <h2 class="feature-card-title">Explore Ideas</h2>
+                            <p class="feature-card-desc">Brainstorm, plan, and turn ideas into reality.</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script -->
+    <script src="js/main.js"></script>
+</body>
+</html>

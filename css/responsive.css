@@ -1,0 +1,269 @@
+/* ==========================================================================
+   Ron AI — Responsive Styles
+   ========================================================================== */
+
+/* --- Laptop & Medium Screens (max-width: 1180px) --- */
+@media (max-width: 1180px) {
+    .page-wrapper {
+        padding: 12px 24px 28px;
+    }
+
+    .hero-title {
+        font-size: 3.4rem;
+    }
+
+    .mascot-stage {
+        max-width: 520px;
+        height: 460px;
+    }
+
+    .mascot-wrapper {
+        width: 440px;
+        height: 440px;
+    }
+
+    .chip-ask {
+        top: 30px;
+        left: 40px;
+    }
+
+    .chip-write {
+        top: 45px;
+        right: 15px;
+    }
+
+    .chip-analyze {
+        top: 220px;
+        left: -15px;
+    }
+
+    .chip-solve {
+        top: 200px;
+        right: -15px;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+}
+
+/* --- Tablets (max-width: 920px) --- */
+@media (max-width: 920px) {
+    .hero-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+    }
+
+    .hero-text-col {
+        align-items: center;
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .hero-title {
+        font-size: 3.1rem;
+    }
+
+    .hero-description {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-trust-list {
+        justify-content: center;
+    }
+
+    .mascot-stage {
+        margin: 0 auto;
+        max-width: 520px;
+    }
+
+    /* Mobile Navbar Hamburger */
+    .mobile-toggle-btn {
+        display: flex;
+    }
+
+    .nav-menu {
+        position: absolute;
+        top: calc(100% + 12px);
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 22px;
+        box-shadow: 0 16px 36px rgba(12, 35, 75, 0.12);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: var(--transition-smooth);
+    }
+
+    body.dark-theme .nav-menu {
+        background: rgba(18, 29, 58, 0.96);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .nav-menu.open {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .nav-list {
+        flex-direction: column;
+        gap: 18px;
+        width: 100%;
+    }
+
+    .nav-link {
+        display: block;
+        padding: 8px 16px;
+        font-size: 1.05rem;
+    }
+
+    .active-indicator {
+        left: 16px;
+        width: 36px;
+        bottom: 2px;
+    }
+}
+
+/* --- Mobile Phones (max-width: 600px) --- */
+@media (max-width: 600px) {
+    .page-wrapper {
+        padding: 8px 16px 24px;
+    }
+
+    .navbar {
+        top: 8px;
+    }
+
+    .nav-container {
+        padding: 8px 16px;
+    }
+
+    .nav-cta {
+        padding: 8px 16px;
+        font-size: 0.88rem;
+    }
+
+    .hero-section {
+        padding: 12px 0 24px;
+    }
+
+    .hero-title {
+        font-size: 2.35rem;
+    }
+
+    .hero-badge {
+        padding: 6px 14px;
+        margin-bottom: 16px;
+    }
+
+    .badge-text {
+        font-size: 0.82rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+        margin-bottom: 24px;
+    }
+
+    .btn-hero {
+        width: 100%;
+        padding: 14px 28px;
+        font-size: 1.02rem;
+    }
+
+    .hero-trust-list {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    /* Mobile Mascot & Chips */
+    .mascot-stage {
+        height: 400px;
+        max-width: 100%;
+    }
+
+    .mascot-wrapper {
+        width: 320px;
+        height: 320px;
+    }
+
+    .floating-chip {
+        padding: 8px 14px;
+        border-radius: 14px;
+        gap: 8px;
+    }
+
+    .chip-icon-box {
+        width: 32px;
+        height: 32px;
+    }
+
+    .chip-icon-box svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .chip-title, .chip-sub {
+        font-size: 0.8rem;
+    }
+
+    .chip-ask {
+        top: 15px;
+        left: 15px;
+    }
+
+    .chip-write {
+        top: 25px;
+        right: 10px;
+    }
+
+    .chip-analyze {
+        top: 195px;
+        left: 0px;
+    }
+
+    .chip-solve {
+        top: 185px;
+        right: 0px;
+    }
+
+    .deco-paper-plane {
+        top: -10px;
+        right: 15px;
+    }
+
+    .plane-svg {
+        width: 34px;
+        height: 34px;
+    }
+
+    /* Single Column Features on Mobile */
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .feature-card {
+        padding: 24px 20px;
+    }
+}
+
+/* --- Accessibility: Reduced Motion --- */
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

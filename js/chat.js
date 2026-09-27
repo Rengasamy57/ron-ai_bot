@@ -998,7 +998,6 @@ function logout() {
 async function initChat() {
   DOM.chatShell = document.querySelector('.chat-shell');
   DOM.sidebar = document.getElementById('chatSidebar');
-  DOM.overlay = document.getElementById('sidebarOverlay');
   DOM.hamburger = document.getElementById('btnHamburger');
   DOM.btnNewChat = document.getElementById('btnNewChat');
   DOM.chatList = document.getElementById('chatList');

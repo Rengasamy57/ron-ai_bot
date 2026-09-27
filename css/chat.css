@@ -967,13 +967,6 @@ textarea, input {
   font-family: inherit;
 }
 
-/* ============================================================
-   MOBILE RESPONSIVENESS (412x892)
-   ============================================================ */
-.sidebar-overlay {
-  display: none !important;
-}
-
 .hidden {
   display: none !important;
 }

@@ -126,7 +126,8 @@ function renderUserProfile() {
   if (DOM.sidebarUserAvatar) DOM.sidebarUserAvatar.textContent = initials;
 
   if (DOM.headerUserName) DOM.headerUserName.textContent = firstName;
-  if (DOM.headerUserAvatar) DOM.headerUserAvatar.textContent = initials;
+  if (DOM.dropdownUserName) DOM.dropdownUserName.textContent = name;
+  if (DOM.dropdownUserEmail) DOM.dropdownUserEmail.textContent = email;
   if (DOM.greetingName) DOM.greetingName.textContent = firstName + '!';
 }
 
@@ -252,28 +253,15 @@ function appendUserBubble(content, timestamp) {
   const group = document.createElement('div');
   group.className = 'message-group user';
 
-  const userInitial = getInitials(currentUser?.name || currentUser?.full_name || 'U');
-
-  const row = document.createElement('div');
-  row.className = 'message-user-row';
-
   const bubble = document.createElement('div');
-  bubble.className = 'message-bubble';
+  bubble.className = 'message-bubble user-bubble';
   bubble.textContent = content;
 
-  const avatar = document.createElement('div');
-  avatar.className = 'msg-user-avatar';
-  avatar.textContent = userInitial;
-  avatar.setAttribute('aria-hidden', 'true');
-
-  row.appendChild(bubble);
-  row.appendChild(avatar);
-
   const time = document.createElement('div');
-  time.className = 'message-time';
+  time.className = 'message-time user-time';
   time.textContent = formatClockTime(timestamp);
 
-  group.appendChild(row);
+  group.appendChild(bubble);
   group.appendChild(time);
   DOM.messagesList.appendChild(group);
 }
@@ -396,25 +384,16 @@ function handleRegenerate(promptText) {
 function formatAssistantText(text) {
   if (!text) return '';
 
-  // 1. Normalize line breaks
-  let raw = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-  // 2. Extract fenced code blocks first so their contents aren't parsed as markdown
-  const codeBlocks = [];
-  raw = raw.replace(/(?:^|\n)```([a-zA-Z0-9_\-\+\.]*)\n?([\s\S]*?)(?:```|$)/g, (match, lang, code) => {
-    const cleanLang = (lang || 'code').trim().toLowerCase();
-    const cleanCode = code.replace(/\n$/, '');
-    const id = codeBlocks.length;
-    codeBlocks.push({
-      lang: cleanLang,
-      code: cleanCode
-    });
-    return `\n\n%%CODE_BLOCK_${id}%%\n\n`;
-  });
-
-  // 3. Process lines and block elements
-  const lines = raw.split('\n');
+  const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const lines = normalized.split('\n');
   const blocks = [];
+
+  let inCodeBlock = false;
+  let codeFenceChar = '';
+  let codeFenceLen = 0;
+  let codeLang = 'code';
+  let codeLines = [];
+
   let currentList = null; // { type: 'ul' | 'ol', items: [] }
   let currentTable = null; // { headers: [], rows: [] }
   let currentBlockquote = [];
@@ -430,13 +409,10 @@ function formatAssistantText(text) {
 
   function flushList() {
     if (currentList) {
-      if (currentList.type === 'ul') {
-        const itemsHtml = currentList.items.map(it => `<li>${formatInlineMarkup(it)}</li>`).join('');
-        blocks.push(`<ul class="assistant-bullet-list">${itemsHtml}</ul>`);
-      } else {
-        const itemsHtml = currentList.items.map(it => `<li>${formatInlineMarkup(it)}</li>`).join('');
-        blocks.push(`<ol class="assistant-numbered-list">${itemsHtml}</ol>`);
-      }
+      const tag = currentList.type === 'ul' ? 'ul' : 'ol';
+      const cls = currentList.type === 'ul' ? 'assistant-bullet-list' : 'assistant-numbered-list';
+      const itemsHtml = currentList.items.map(it => `<li>${formatInlineMarkup(it)}</li>`).join('');
+      blocks.push(`<${tag} class="${cls}">${itemsHtml}</${tag}>`);
       currentList = null;
     }
   }
@@ -468,54 +444,85 @@ function formatAssistantText(text) {
     }
   }
 
+  function flushCodeBlock() {
+    if (inCodeBlock) {
+      const escaped = escapeHtml(codeLines.join('\n'));
+      const langDisplay = (codeLang && codeLang !== 'code') ? codeLang : 'Code';
+      blocks.push(`
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span class="code-lang-label">${escapeHtml(langDisplay)}</span>
+            <button class="btn-copy-code" type="button" aria-label="Copy code snippet">
+              <svg class="copy-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span class="copy-label">Copy code</span>
+            </button>
+          </div>
+          <pre class="code-block-pre"><code class="code-block-content language-${escapeHtml(codeLang)}">${escaped}</code></pre>
+        </div>
+      `);
+      inCodeBlock = false;
+      codeLines = [];
+      codeLang = 'code';
+    }
+  }
+
   function flushAll() {
     flushParagraph();
     flushList();
     flushBlockquote();
     flushTable();
+    flushCodeBlock();
   }
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+
+    // If currently inside a fenced code block, check for closing fence
+    if (inCodeBlock) {
+      const closeMatch = line.match(/^[ \t]*(`{3,}|~{3,})[ \t]*$/);
+      if (closeMatch && closeMatch[1][0] === codeFenceChar && closeMatch[1].length >= codeFenceLen) {
+        flushCodeBlock();
+      } else {
+        codeLines.push(line);
+      }
+      continue;
+    }
+
     const trimmed = line.trim();
 
-    // Check code block placeholder
-    const codeMatch = trimmed.match(/^%%CODE_BLOCK_(\d+)%%$/);
-    if (codeMatch) {
-      flushAll();
-      const blockId = parseInt(codeMatch[1], 10);
-      const cb = codeBlocks[blockId];
-      if (cb) {
-        const escaped = escapeHtml(cb.code);
-        const langDisplay = cb.lang === 'code' ? 'Code' : cb.lang;
-        blocks.push(`
-          <div class="code-block-wrapper">
-            <div class="code-block-header">
-              <span class="code-lang-label">${escapeHtml(langDisplay)}</span>
-              <button class="btn-copy-code" type="button" aria-label="Copy code snippet">
-                <svg class="copy-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                <span class="copy-label">Copy code</span>
-              </button>
-            </div>
-            <pre class="code-block-pre"><code class="code-block-content language-${escapeHtml(cb.lang)}">${escaped}</code></pre>
-          </div>
-        `);
-      }
+    // Check for fenced code block opening (``` or ~~~ with optional language)
+    const openMatch = line.match(/^[ \t]*(`{3,}|~{3,})[ \t]*([a-zA-Z0-9_\-\+\.#]*)[^\r\n]*/);
+    if (openMatch) {
+      flushParagraph();
+      flushList();
+      flushBlockquote();
+      flushTable();
+      inCodeBlock = true;
+      codeFenceChar = openMatch[1][0];
+      codeFenceLen = openMatch[1].length;
+      codeLang = openMatch[2].trim().toLowerCase() || 'code';
+      codeLines = [];
       continue;
     }
 
     // Blank line
     if (!trimmed) {
-      flushAll();
+      flushParagraph();
+      flushList();
+      flushBlockquote();
+      flushTable();
       continue;
     }
 
     // Horizontal Rule: --- or *** or ___
     if (/^(?:---+|\*\*\*+|___+)\s*$/.test(trimmed)) {
-      flushAll();
+      flushParagraph();
+      flushList();
+      flushBlockquote();
+      flushTable();
       blocks.push('<hr class="assistant-hr" />');
       continue;
     }
@@ -523,7 +530,10 @@ function formatAssistantText(text) {
     // Headings: #, ##, ###, ####
     const headingMatch = trimmed.match(/^(#{1,4})\s+(.+)$/);
     if (headingMatch) {
-      flushAll();
+      flushParagraph();
+      flushList();
+      flushBlockquote();
+      flushTable();
       const level = headingMatch[1].length;
       const headingContent = formatInlineMarkup(headingMatch[2].trim());
       blocks.push(`<h${level} class="assistant-h${level}">${headingContent}</h${level}>`);
@@ -538,7 +548,7 @@ function formatAssistantText(text) {
       flushTable();
       currentBlockquote.push(quoteMatch[1]);
       continue;
-    } else {
+    } else if (currentBlockquote.length > 0) {
       flushBlockquote();
     }
 
@@ -965,21 +975,16 @@ function scrollToBottom(force = false, smooth = false) {
 }
 
 function toggleSidebar() {
-  const isOpen = DOM.sidebar.classList.contains('open');
-  if (isOpen) closeSidebar();
-  else openSidebar();
-}
-
-function openSidebar() {
-  DOM.sidebar.classList.add('open');
-  DOM.overlay.classList.add('visible');
-  document.body.style.overflow = 'hidden';
+  if (!DOM.chatShell) return;
+  const isCollapsed = DOM.chatShell.classList.toggle('sidebar-collapsed');
+  localStorage.setItem('ron-sidebar-collapsed', isCollapsed ? 'true' : 'false');
 }
 
 function closeSidebar() {
-  DOM.sidebar.classList.remove('open');
-  DOM.overlay.classList.remove('visible');
-  document.body.style.overflow = '';
+  if (DOM.chatShell) {
+    DOM.chatShell.classList.add('sidebar-collapsed');
+    localStorage.setItem('ron-sidebar-collapsed', 'true');
+  }
 }
 
 function logout() {
@@ -991,6 +996,7 @@ function logout() {
  * Initialize
  */
 async function initChat() {
+  DOM.chatShell = document.querySelector('.chat-shell');
   DOM.sidebar = document.getElementById('chatSidebar');
   DOM.overlay = document.getElementById('sidebarOverlay');
   DOM.hamburger = document.getElementById('btnHamburger');
@@ -1001,8 +1007,12 @@ async function initChat() {
   DOM.sidebarUserName = document.getElementById('sidebarUserName');
   DOM.sidebarUserEmail = document.getElementById('sidebarUserEmail');
   DOM.btnLogout = document.getElementById('btnLogout');
-  DOM.headerUserAvatar = document.getElementById('headerUserAvatar');
+  DOM.headerUserMenu = document.getElementById('headerUserMenu');
+  DOM.headerUserBtn = document.getElementById('headerUserBtn');
   DOM.headerUserName = document.getElementById('headerUserName');
+  DOM.dropdownUserName = document.getElementById('dropdownUserName');
+  DOM.dropdownUserEmail = document.getElementById('dropdownUserEmail');
+  DOM.btnHeaderLogout = document.getElementById('btnHeaderLogout');
   DOM.messagesArea = document.getElementById('chatMessages');
   DOM.messagesList = document.getElementById('messagesList');
   DOM.welcomeState = document.getElementById('welcomeState');
@@ -1017,28 +1027,35 @@ async function initChat() {
   // Load user's conversations
   await loadConversations();
 
+  // Restore desktop sidebar collapsed state
+  const savedSidebarCollapsed = localStorage.getItem('ron-sidebar-collapsed');
+  if (savedSidebarCollapsed === 'true' && DOM.chatShell) {
+    DOM.chatShell.classList.add('sidebar-collapsed');
+  }
+
   // Event Listeners
   if (DOM.hamburger) DOM.hamburger.addEventListener('click', toggleSidebar);
-  if (DOM.overlay) DOM.overlay.addEventListener('click', closeSidebar);
   if (DOM.btnNewChat) DOM.btnNewChat.addEventListener('click', handleNewChat);
   if (DOM.btnLogout) DOM.btnLogout.addEventListener('click', logout);
 
-  // Apply saved theme on startup
-  const savedTheme = localStorage.getItem('ron-theme') || 'light';
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-theme');
-  } else {
-    document.body.classList.remove('dark-theme');
+  // Minimal User Menu dropdown
+  if (DOM.headerUserBtn && DOM.headerUserMenu) {
+    DOM.headerUserBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = DOM.headerUserMenu.classList.toggle('open');
+      DOM.headerUserBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (DOM.headerUserMenu && !DOM.headerUserMenu.contains(e.target)) {
+        DOM.headerUserMenu.classList.remove('open');
+        DOM.headerUserBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
   }
 
-  // Theme Toggle
-  const themeToggle = document.getElementById('themeToggleChat');
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-theme');
-      const isDark = document.body.classList.contains('dark-theme');
-      localStorage.setItem('ron-theme', isDark ? 'dark' : 'light');
-    });
+  if (DOM.btnHeaderLogout) {
+    DOM.btnHeaderLogout.addEventListener('click', logout);
   }
 
   // Composer events: Enter to Send, Shift+Enter for New Line

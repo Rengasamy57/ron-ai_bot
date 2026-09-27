@@ -107,12 +107,12 @@
        ====================================================== -->
   <main class="chat-main" role="main">
 
-    <!-- Top Chat Header (Matching Reference with Theme Icon + User Chip) -->
+    <!-- Top Chat Header (Desktop Sidebar Toggle + Brand + Minimal User Menu) -->
     <header class="chat-header" role="banner">
       <div class="header-left">
-        <!-- Mobile hamburger -->
-        <button class="btn-hamburger" id="btnHamburger" aria-label="Toggle navigation menu" aria-controls="chatSidebar">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Desktop sidebar toggle button -->
+        <button class="btn-hamburger" id="btnHamburger" aria-label="Toggle sidebar" title="Toggle sidebar">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -136,29 +136,38 @@
         </div>
       </div>
 
-      <!-- Right: Theme Toggle + User Avatar Chip -->
+      <!-- Right: Minimal User Account Control (No Theme Toggle) -->
       <div class="header-right">
-        <!-- Theme toggle icon matching reference -->
-        <button class="header-theme-btn" id="themeToggleChat" aria-label="Toggle theme" title="Toggle theme">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2v2"></path>
-            <path d="M12 20v2"></path>
-            <path d="m4.93 4.93 1.41 1.41"></path>
-            <path d="m17.66 17.66 1.41 1.41"></path>
-            <path d="M2 12h2"></path>
-            <path d="M20 12h2"></path>
-            <path d="m6.34 17.66-1.41 1.41"></path>
-            <path d="m19.07 4.93-1.41 1.41"></path>
-          </svg>
-        </button>
+        <div class="header-user-menu" id="headerUserMenu">
+          <button class="header-user-btn" id="headerUserBtn" aria-label="User account menu" aria-haspopup="true" aria-expanded="false">
+            <div class="header-user-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <span class="header-user-name" id="headerUserName">User</span>
+            <svg class="header-user-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
 
-        <div class="header-user-chip" role="status" aria-live="polite">
-          <div class="header-user-avatar" id="headerUserAvatar" aria-hidden="true">U</div>
-          <span class="header-user-name" id="headerUserName">User</span>
-          <svg class="header-user-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
+          <!-- Minimal User Dropdown -->
+          <div class="header-user-dropdown" id="headerUserDropdown" role="menu">
+            <div class="dropdown-header">
+              <div class="dropdown-user-name" id="dropdownUserName">User</div>
+              <div class="dropdown-user-email" id="dropdownUserEmail">email@example.com</div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item btn-header-logout" id="btnHeaderLogout" role="menuitem">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Sign out</span>
+            </button>
+          </div>
         </div>
       </div>
     </header>

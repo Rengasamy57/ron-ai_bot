@@ -14,7 +14,7 @@
 
 ```mermaid
 flowchart LR
-    Client["Browser (Vanilla HTML/CSS/JS)"] <--> |REST API / JWT| Backend["FastAPI Backend (Uvicorn)"]
+    Client["Browser (Vanilla HTML/CSS/JS)"] <--> |FAST API / JWT| Backend["FastAPI Backend (Uvicorn)"]
     Backend <--> |SQLAlchemy / Psycopg 3| DB[("PostgreSQL Database")]
     Backend <--> |HTTPX Async Gateway| OpenRouter["OpenRouter AI (openrouter/auto)"]
 ```
